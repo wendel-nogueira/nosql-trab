@@ -24,24 +24,6 @@ app.use(express.json());
 app.use(cors());
 app.set("trust proxy", true);
 
-connectToDatabaseMongodb()
-  .then(() => {
-    console.log("Conectado ao MongoDB");
-  })
-  .catch((error) => {
-    console.error("Erro ao conectar ao MongoDB", error);
-    process.exit(1);
-  });
-
-connectToRedis()
-  .then(() => {
-    console.log("Conectado ao Redis");
-  })
-  .catch((error) => {
-    console.error("Erro ao conectar ao Redis", error);
-    process.exit(1);
-  });
-
 app.use("/", router);
 app.use(ErrorHandler);
 

@@ -1,11 +1,30 @@
 import { Product } from "../entities/product.model";
 import { ICatalogRepository } from "./icatalog.repository";
 import { Filters } from "../entities/filters.model";
-import { collection } from "../../../config/database";
+import { connectToDatabaseMongodb } from "../../../config/database";
+import { Db } from "mongodb";
 
 export class CatalogRepository implements ICatalogRepository {
+  private db: Db | undefined;
+  private collection: any;
+
+  constructor() {
+    this.db = undefined;
+    this.init();
+  }
+
+  async init(): Promise<void> {
+    this.db = await connectToDatabaseMongodb();
+    this.collection = this.db.collection("video_games");
+  }
+
   async getProductById(id: string): Promise<Product | null> {
-    return collection.findOne({ id });
+    console.log("getProductById", id);
+    if (!this.db) await this.init();
+
+    const product = await this.collection.findOne({ id });
+
+    return product;
   }
 
   async getProducts(
@@ -19,24 +38,26 @@ export class CatalogRepository implements ICatalogRepository {
     maxPrice: number;
     minPrice: number;
   }> {
+    if (!this.db) await this.init();
+
     const query = filters ? this.buildQuery(filters) : {};
     const sortQuery = this.buildSortQuery(sort);
-    const products = await collection
+    const products = await this.collection
       .find(query)
       .sort(sortQuery)
       .skip(offset)
       .limit(limit)
       .toArray();
 
-    const count = await collection.countDocuments(query);
-    const maxPrice = await collection
+    const count = await this.collection.countDocuments(query);
+    const maxPrice = await this.collection
       .find()
       .sort({ price: -1 })
       .limit(1)
       .toArray()
       .then((result: any) => result[0]?.price || 0);
 
-    const minPrice = await collection
+    const minPrice = await this.collection
       .find()
       .sort({ price: 1 })
       .limit(1)
@@ -47,7 +68,9 @@ export class CatalogRepository implements ICatalogRepository {
   }
 
   async getAllCategories(): Promise<string[]> {
-    const categories = await collection
+    if (!this.db) await this.init();
+
+    const categories = await this.collection
       .distinct("categories", {})
       .then((result: any) => result as string[]);
 
@@ -57,7 +80,9 @@ export class CatalogRepository implements ICatalogRepository {
   }
 
   async getAllBrands(): Promise<string[]> {
-    const brands = await collection
+    if (!this.db) await this.init();
+
+    const brands = await this.collection
       .distinct("details.Manufacturer", {})
       .then((result: any) => result as string[]);
 

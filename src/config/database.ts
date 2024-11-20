@@ -9,7 +9,6 @@ const mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017";
 const client = new MongoClient(mongoURI);
 
 let mongoDbInstance: Db | null = null;
-let collection: any;
 
 export async function connectToDatabaseMongodb(): Promise<Db> {
   if (mongoDbInstance) {
@@ -19,7 +18,6 @@ export async function connectToDatabaseMongodb(): Promise<Db> {
   await client.connect();
 
   mongoDbInstance = client.db("ecommerce");
-  collection = mongoDbInstance.collection("video_games");
 
   return mongoDbInstance;
 }
@@ -56,4 +54,4 @@ export async function disconnectFromRedis(): Promise<void> {
   }
 }
 
-export { mongoDbInstance, collection, redisClient };
+export { mongoDbInstance, redisClient };

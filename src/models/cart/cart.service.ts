@@ -2,7 +2,11 @@ import { Product } from "./entities/product.entity";
 import { CartRepository } from "./repositories/cart.repository";
 
 export class CartService {
-  constructor(private cartRepository: CartRepository) {}
+  private cartRepository: CartRepository;
+
+  constructor() {
+    this.cartRepository = new CartRepository();
+  }
 
   async getCartItems(userId: string) {
     return this.cartRepository.getCartItems(userId);

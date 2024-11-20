@@ -6,16 +6,10 @@ import { ValidateDto } from "../../utils/validator";
 import { AddProductDto } from "./dto/add-product.dto";
 
 export class CartController {
-  private cartService: CartService | undefined;
+  private cartService: CartService;
 
   constructor() {
-    this.init();
-  }
-
-  private async init() {
-    const client = await connectToRedis();
-    const cartRepository = new CartRepository(client);
-    this.cartService = new CartService(cartRepository);
+    this.cartService = new CartService();
   }
 
   getCartItems = async (req: Request, res: Response) => {
