@@ -1,17 +1,14 @@
 {
+  "name": "teste",
   "version": 2,
+  "public": true,
   "builds": [
     {
-      "src": "dist/server.js",
+      "src": "server.ts",
       "use": "@vercel/node"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/dist/server.js"
-    }
-  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "server.ts" }],
   "headers": [
     {
       "source": "/(.*)",

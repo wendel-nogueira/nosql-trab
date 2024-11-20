@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node server.js",
     "build": "tsc",
     "runbuild": "npm run build && npm start",
-    "dev": "ts-node-dev --respawn --transpile-only --exit-child --watch src src/server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only --exit-child --watch src server.ts"
   },
   "keywords": [],
   "author": "",

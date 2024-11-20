@@ -2,14 +2,14 @@ import express from "express";
 import cors from "cors";
 import "reflect-metadata";
 import "express-async-errors";
-import { router } from "./routes";
-import { ErrorHandler } from "./utils/error-handler";
+import { router } from "./src/routes";
+import { ErrorHandler } from "./src/utils/error-handler";
 import dotenv from "dotenv";
 
 import {
   disconnectFromDatabaseMongoDb,
   disconnectFromRedis,
-} from "./config/database";
+} from "./src/config/database";
 
 dotenv.config();
 
