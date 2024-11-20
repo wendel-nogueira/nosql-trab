@@ -11,6 +11,10 @@ export class CatalogController {
   private catalogService: CatalogService | undefined;
 
   constructor() {
+    this.init();
+  }
+
+  private async init() {
     connectToDatabaseMongodb().then(
       (database) => {
         const catalogRepository = new CatalogRepository(database);
