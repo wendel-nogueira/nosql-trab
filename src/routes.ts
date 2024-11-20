@@ -7,6 +7,10 @@ const router = Router();
 const catalogController = new CatalogController();
 const cartController = new CartController();
 
+router.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 router.post("/catalog", catalogController.getCatalog);
 router.get("/catalog/:id", catalogController.getProductById);
 router.get("/categories", catalogController.getAllCategories);
