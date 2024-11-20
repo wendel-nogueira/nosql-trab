@@ -4,14 +4,17 @@ import "reflect-metadata";
 import "express-async-errors";
 import { router } from "./routes";
 import { ErrorHandler } from "./utils/error-handler";
+import dotenv from "dotenv";
 
 import {
   disconnectFromDatabaseMongoDb,
   disconnectFromRedis,
 } from "./config/database";
 
+dotenv.config();
+
 const app = express();
-const port = 3000;
+const port = process.env.APP_PORT || 3000;
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.json());
