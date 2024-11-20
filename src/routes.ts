@@ -1,24 +1,24 @@
 import { Router } from "express";
+import { container, setupContainer } from "./utils/setup";
 import { CatalogController } from "./models/catalog/catalog.controller";
-import { CartController } from "./models/cart/cart.controller";
 
 const router = Router();
 
-const catalogController = new CatalogController();
-const cartController = new CartController();
+export async function setupRoutes(): Promise<Router> {
+  await setupContainer();
 
-router.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+  const catalogController = container.get(CatalogController);
 
-router.post("/catalog", catalogController.getCatalog);
-router.get("/catalog/:id", catalogController.getProductById);
-router.get("/categories", catalogController.getAllCategories);
-router.get("/brands", catalogController.getAllBrands);
+  router.get("/", (req, res) => {
+    res.send("Hello World!");
+  });
 
-router.get("/cart/:userId", cartController.getCartItems);
-router.post("/cart/:userId", cartController.addCartItem);
-router.delete("/cart/:userId/:productId", cartController.removeCartItem);
-router.delete("/cart/:userId/clear", cartController.clearCart);
+  router.post("/catalog", catalogController.getCatalog);
+  router.get("/catalog/:id", catalogController.getProductById);
+  router.get("/categories", catalogController.getAllCategories);
+  router.get("/brands", catalogController.getAllBrands);
 
-export { router };
+  return router;
+}
+
+export default router;

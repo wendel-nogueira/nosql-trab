@@ -1,31 +1,14 @@
 import { Request, Response } from "express";
 import { CatalogService } from "./catalog.service";
-import { connectToDatabaseMongodb } from "../../config/database";
-import { CatalogRepository } from "./repositories/catalog.repository";
 import { NotFoundException } from "../../utils/exceptions";
 import { GetProductsDto } from "./dto/get-products.dto";
 import { ValidateDto } from "../../utils/validator";
 import { Filters } from "./entities/filters.model";
+import { injectable, inject } from "inversify";
 
+@injectable()
 export class CatalogController {
-  private catalogService: CatalogService | undefined;
-
-  constructor() {
-    this.init();
-  }
-
-  private async init() {
-    connectToDatabaseMongodb().then(
-      (database) => {
-        const catalogRepository = new CatalogRepository(database);
-        this.catalogService = new CatalogService(catalogRepository);
-      },
-      (error) => {
-        console.error("Error connecting to database", error);
-        throw new Error("Error connecting to database");
-      }
-    );
-  }
+  constructor(@inject(CatalogService) private catalogService: CatalogService) {}
 
   getCatalog = async (req: Request, res: Response) => {
     const dto = await ValidateDto(req.body, GetProductsDto);

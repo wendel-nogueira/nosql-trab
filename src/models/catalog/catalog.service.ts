@@ -1,9 +1,14 @@
 import { CatalogRepository } from "./repositories/catalog.repository";
 import { Product } from "./entities/product.model";
 import { Filters } from "./entities/filters.model";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CatalogService {
-  constructor(private catalogRepository: CatalogRepository) {}
+  constructor(
+    @inject(CatalogRepository)
+    private catalogRepository: CatalogRepository
+  ) {}
 
   async getProducts(
     filters: Filters | undefined,
@@ -31,7 +36,6 @@ export class CatalogService {
 
   async getAllCategories(): Promise<string[]> {
     var categories = await this.catalogRepository.getAllCategories();
-
     return categories;
   }
 

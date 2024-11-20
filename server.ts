@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import "reflect-metadata";
 import "express-async-errors";
-import { router } from "./src/routes";
+import { setupRoutes } from "./src/routes";
 import { ErrorHandler } from "./src/utils/error-handler";
 import dotenv from "dotenv";
 
@@ -21,17 +21,23 @@ app.use(express.json());
 app.use(cors());
 app.set("trust proxy", true);
 
-app.use("/", router);
-app.use(ErrorHandler);
+async function start() {
+  const router = await setupRoutes();
 
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
+  app.use("/", router);
+  app.use(ErrorHandler);
+
+  app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
+}
 
 process.on("SIGINT", async () => {
-  await disconnectFromDatabaseMongoDb();
-  await disconnectFromRedis();
+  disconnectFromDatabaseMongoDb();
+  disconnectFromRedis();
   process.exit(0);
 });
+
+start();
 
 export default app;

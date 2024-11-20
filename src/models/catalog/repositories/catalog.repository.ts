@@ -2,11 +2,13 @@ import { Db, Collection } from "mongodb";
 import { Product } from "../entities/product.model";
 import { ICatalogRepository } from "./icatalog.repository";
 import { Filters } from "../entities/filters.model";
+import { injectable, inject } from "inversify";
 
+@injectable()
 export class CatalogRepository implements ICatalogRepository {
-  private collection: Collection<Product>;
+  private collection: any;
 
-  constructor(database: Db) {
+  constructor(@inject(Db) private database: Db) {
     this.collection = database.collection<Product>("video_games");
   }
 
@@ -40,14 +42,14 @@ export class CatalogRepository implements ICatalogRepository {
       .sort({ price: -1 })
       .limit(1)
       .toArray()
-      .then((result) => result[0]?.price || 0);
+      .then((result: any) => result[0]?.price || 0);
 
     const minPrice = await this.collection
       .find()
       .sort({ price: 1 })
       .limit(1)
       .toArray()
-      .then((result) => result[0]?.price || 0);
+      .then((result: any) => result[0]?.price || 0);
 
     return { products, count, maxPrice, minPrice };
   }
@@ -55,7 +57,7 @@ export class CatalogRepository implements ICatalogRepository {
   async getAllCategories(): Promise<string[]> {
     const categories = await this.collection
       .distinct("categories", {})
-      .then((result) => result as string[]);
+      .then((result: any) => result as string[]);
 
     categories.sort();
 
@@ -65,7 +67,7 @@ export class CatalogRepository implements ICatalogRepository {
   async getAllBrands(): Promise<string[]> {
     const brands = await this.collection
       .distinct("details.Manufacturer", {})
-      .then((result) => result as string[]);
+      .then((result: any) => result as string[]);
 
     brands.sort();
 
