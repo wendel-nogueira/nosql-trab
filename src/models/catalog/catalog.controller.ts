@@ -4,11 +4,13 @@ import { NotFoundException } from "../../utils/exceptions";
 import { GetProductsDto } from "./dto/get-products.dto";
 import { ValidateDto } from "../../utils/validator";
 import { Filters } from "./entities/filters.model";
-import { injectable, inject } from "inversify";
 
-@injectable()
 export class CatalogController {
-  constructor(@inject(CatalogService) private catalogService: CatalogService) {}
+  private catalogService: CatalogService;
+
+  constructor() {
+    this.catalogService = new CatalogService();
+  }
 
   getCatalog = async (req: Request, res: Response) => {
     const dto = await ValidateDto(req.body, GetProductsDto);

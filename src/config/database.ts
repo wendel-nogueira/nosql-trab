@@ -9,6 +9,7 @@ const mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017";
 const client = new MongoClient(mongoURI);
 
 let mongoDbInstance: Db | null = null;
+let collection: any;
 
 export async function connectToDatabaseMongodb(): Promise<Db> {
   if (mongoDbInstance) {
@@ -16,8 +17,9 @@ export async function connectToDatabaseMongodb(): Promise<Db> {
   }
 
   await client.connect();
+
   mongoDbInstance = client.db("ecommerce");
-  console.log("Conectado ao MongoDB");
+  collection = mongoDbInstance.collection("video_games");
 
   return mongoDbInstance;
 }
@@ -37,11 +39,12 @@ export async function connectToRedis(): Promise<RedisClientType> {
   redisClient = createClient({
     url: process.env.REDIS_URI || "redis://localhost:6379",
   });
+
   redisClient.on("error", (error) =>
     console.error("Redis Client Error", error)
   );
+
   await redisClient.connect();
-  console.log("Conectado ao Redis");
 
   return redisClient;
 }
@@ -52,3 +55,5 @@ export async function disconnectFromRedis(): Promise<void> {
     console.log("Desconectado do Redis");
   }
 }
+
+export { mongoDbInstance, collection, redisClient };

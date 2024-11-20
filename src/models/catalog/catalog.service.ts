@@ -1,14 +1,13 @@
 import { CatalogRepository } from "./repositories/catalog.repository";
 import { Product } from "./entities/product.model";
 import { Filters } from "./entities/filters.model";
-import { inject, injectable } from "inversify";
 
-@injectable()
 export class CatalogService {
-  constructor(
-    @inject(CatalogRepository)
-    private catalogRepository: CatalogRepository
-  ) {}
+  private catalogRepository: CatalogRepository;
+
+  constructor() {
+    this.catalogRepository = new CatalogRepository();
+  }
 
   async getProducts(
     filters: Filters | undefined,

@@ -1,19 +1,11 @@
-import { Db, Collection } from "mongodb";
 import { Product } from "../entities/product.model";
 import { ICatalogRepository } from "./icatalog.repository";
 import { Filters } from "../entities/filters.model";
-import { injectable, inject } from "inversify";
+import { collection } from "../../../config/database";
 
-@injectable()
 export class CatalogRepository implements ICatalogRepository {
-  private collection: any;
-
-  constructor(@inject(Db) private database: Db) {
-    this.collection = database.collection<Product>("video_games");
-  }
-
   async getProductById(id: string): Promise<Product | null> {
-    return this.collection.findOne({ id });
+    return collection.findOne({ id });
   }
 
   async getProducts(
@@ -29,22 +21,22 @@ export class CatalogRepository implements ICatalogRepository {
   }> {
     const query = filters ? this.buildQuery(filters) : {};
     const sortQuery = this.buildSortQuery(sort);
-    const products = await this.collection
+    const products = await collection
       .find(query)
       .sort(sortQuery)
       .skip(offset)
       .limit(limit)
       .toArray();
 
-    const count = await this.collection.countDocuments(query);
-    const maxPrice = await this.collection
+    const count = await collection.countDocuments(query);
+    const maxPrice = await collection
       .find()
       .sort({ price: -1 })
       .limit(1)
       .toArray()
       .then((result: any) => result[0]?.price || 0);
 
-    const minPrice = await this.collection
+    const minPrice = await collection
       .find()
       .sort({ price: 1 })
       .limit(1)
@@ -55,7 +47,7 @@ export class CatalogRepository implements ICatalogRepository {
   }
 
   async getAllCategories(): Promise<string[]> {
-    const categories = await this.collection
+    const categories = await collection
       .distinct("categories", {})
       .then((result: any) => result as string[]);
 
@@ -65,7 +57,7 @@ export class CatalogRepository implements ICatalogRepository {
   }
 
   async getAllBrands(): Promise<string[]> {
-    const brands = await this.collection
+    const brands = await collection
       .distinct("details.Manufacturer", {})
       .then((result: any) => result as string[]);
 
