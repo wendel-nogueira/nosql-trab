@@ -7,6 +7,7 @@ import { ErrorHandler } from "./src/utils/error-handler";
 import dotenv from "dotenv";
 
 import {
+  connectToDatabaseMongodb,
   disconnectFromDatabaseMongoDb,
   disconnectFromRedis,
 } from "./src/config/database";
@@ -21,11 +22,13 @@ app.use(express.json());
 app.use(cors());
 app.set("trust proxy", true);
 
-app.use("/", router);
-app.use(ErrorHandler);
+connectToDatabaseMongodb().then(() => {
+  app.use("/", router);
+  app.use(ErrorHandler);
 
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+  app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
 });
 
 process.on("SIGINT", async () => {
