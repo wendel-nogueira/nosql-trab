@@ -9,6 +9,12 @@ export class AddProductDto {
   })
   productId?: string;
 
+  title?: string;
+
+  price?: number;
+
+  image?: string;
+
   @IsNumber({}, { message: "Quantity must be a number" })
   @Min(1, { message: "Quantity must be at least 1" })
   @Max(100, { message: "Quantity must be at most 10" })
