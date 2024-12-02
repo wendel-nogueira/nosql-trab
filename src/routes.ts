@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { CatalogController } from "./models/catalog/catalog.controller";
 import { CartController } from "./models/cart/cart.controller";
-
+import { login, criarConta} from "./models/usuarios/usuarios";
 const router = Router();
 
 const catalogController = new CatalogController();
@@ -21,5 +21,8 @@ router.get("/cart/:userId", cartService.getCartItems);
 router.post("/cart/:userId", cartService.addCartItem);
 router.delete("/cart/:userId/:productId", cartService.removeCartItem);
 router.delete("/cart/:userId/clear", cartService.clearCart);
+
+router.post("/login", login);
+router.post("/register", criarConta);
 
 export default router;
