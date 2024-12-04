@@ -1,4 +1,3 @@
-
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 const bcrypt = require('bcrypt');
@@ -22,8 +21,11 @@ export async function login(req, res) {
     if(!passwordValidado){ 
         return res.status(401).json({ message: 'Dados incorretos!' });
     }
+    const token = jwt.sign({ id: user.id }, process.env.TOKEN);
+
     return res.status(200).json({
-        message: 'Login realizado com sucesso!'
+        message: 'Login realizado com sucesso!',
+        token
     });
     }catch (error) {
         console.error("Erro ao executar operação no Prisma:", error);
@@ -76,4 +78,44 @@ export async function criarConta(req, res) {
           await prisma.$disconnect();
         }
       
+}
+
+
+// export async function verificaToken(req,res,next){
+
+//     const authHeaders = req.headers['authorization'];
+    
+//     const token = authHeaders && authHeaders.split(' ')[1]
+//     //Bearer token
+//     console.log("vendo se pode");
+//     if(token == null) return res.status(401).send('Acesso Negado');
+//     console.log(pode);
+//     jwt.verify(token, process.env.TOKEN, (err) => {
+//         if(err) return res.status(403).send('Token Inválido/Expirado');
+//         next();
+//     })
+
+// }
+
+export async function verificaToken(req, res, next) {
+    console.log("Middleware verificaToken chamado");
+    const authHeaders = req.headers['authorization'];
+    console.log("Cabeçalho Authorization:", authHeaders);
+
+    const token = authHeaders && authHeaders.split(' ')[1];
+    console.log("Token extraído:", token);
+
+    if (!token) {
+        console.log("Nenhum token encontrado");
+        return res.status(401).send('Acesso Negado');
+    }
+
+    jwt.verify(token, process.env.TOKEN, (err, decoded) => {
+        if (err) {
+            console.log("Erro na verificação do token:", err.message);
+            return res.status(403).send('Token Inválido/Expirado');
+        }
+        console.log("Token válido, payload:", decoded);
+        next();
+    });
 }
