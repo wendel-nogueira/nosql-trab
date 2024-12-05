@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { connectToRedis } from "../../config/database";
 import { CartService } from "./cart.service";
-import { CartRepository } from "./repositories/cart.repository";
 import { ValidateDto } from "../../utils/validator";
 import { AddProductDto } from "./dto/add-product.dto";
 import { PrismaClient } from "@prisma/client";
@@ -15,15 +13,8 @@ export class CartController {
 
   getCartItems = async (req: Request, res: Response) => {
     const { userId } = req.params;
-
-    try {
-      const cartItems = await this.cartService?.getCartItems(userId);
-      console.log("oi");
-      return res.status(200).json(cartItems);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).send();
-    }
+    const cartItems = await this.cartService?.getCartItems(userId);
+    return res.status(200).json(cartItems);
   };
 
   addCartItem = async (req: Request, res: Response) => {
@@ -33,16 +24,12 @@ export class CartController {
     if (!cartData) throw new Error("Carrinho vazio");
     console.log("Conteúdo do carrinho:", cartData);
     const dto = await ValidateDto(req.body, AddProductDto);
-    const { productId, quantity } = dto;
+    const { productId, quantity, image, price, title } = dto;
 
-    try {
-      await this.cartService?.addCartItem(userId, {
-        id: productId!,
-        quantity: quantity!,
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    await this.cartService?.addCartItem(userId, {
+      id: productId!,
+      quantity: quantity!,
+    });
 
     return res.status(201).send();
   };

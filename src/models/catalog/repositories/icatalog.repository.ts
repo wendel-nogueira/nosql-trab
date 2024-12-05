@@ -1,5 +1,5 @@
-import { Filters } from "../entities/filters.model";
-import { Product } from "../entities/product.model";
+import { Filters } from "../entities/filters.entity";
+import { Product } from "../entities/product.entity";
 
 export interface ICatalogRepository {
   getProducts(
@@ -16,7 +16,11 @@ export interface ICatalogRepository {
 
   getProductById(id: string): Promise<Product | null>;
 
+  getProductsByIDs(ids: string[]): Promise<Product[]>;
+
   getAllCategories(): Promise<string[]>;
 
   getAllBrands(): Promise<string[]>;
+
+  updateProductStock(productId: string, quantity: number): Promise<void>;
 }

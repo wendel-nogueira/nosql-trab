@@ -1,11 +1,15 @@
+import { NotFoundException } from "../../utils/exceptions";
+import { CatalogRepository } from "../catalog/repositories/catalog.repository";
 import { Product } from "./entities/product.entity";
 import { CartRepository } from "./repositories/cart.repository";
 
 export class CartService {
   private cartRepository: CartRepository;
+  private catalogRepository: CatalogRepository;
 
   constructor() {
     this.cartRepository = new CartRepository();
+    this.catalogRepository = new CatalogRepository();
   }
 
   async getCartItems(userId: string) {
@@ -13,6 +17,16 @@ export class CartService {
   }
 
   async addCartItem(userId: string, product: Product) {
+    const productExists = await this.catalogRepository.getProductById(
+      product.id
+    );
+
+    if (!productExists) throw new NotFoundException("Product not found");
+
+    product.title = productExists.title;
+    product.image = productExists.images[0].hi_res;
+    product.price = productExists.price;
+
     let cartItems = await this.cartRepository.getCartItems(userId);
 
     await this.cartRepository.clearCart(userId);
