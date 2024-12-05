@@ -1,7 +1,9 @@
-import { Image } from "./image.model";
-import { Details } from "./details.model";
+import { Image } from "./image.entity";
+import { Details } from "./details.entity";
+import { ObjectId } from "mongodb";
 
 export interface Product {
+  _id: string | ObjectId;
   id: string;
   main_category: string;
   title: string;
@@ -17,4 +19,5 @@ export interface Product {
   details: Details;
   parent_asin: string;
   bought_together: any;
+  stock: number;
 }

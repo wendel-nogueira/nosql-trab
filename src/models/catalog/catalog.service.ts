@@ -1,6 +1,6 @@
 import { CatalogRepository } from "./repositories/catalog.repository";
-import { Product } from "./entities/product.model";
-import { Filters } from "./entities/filters.model";
+import { Product } from "./entities/product.entity";
+import { Filters } from "./entities/filters.entity";
 
 export class CatalogService {
   private catalogRepository: CatalogRepository;
@@ -42,5 +42,9 @@ export class CatalogService {
     var brands = await this.catalogRepository.getAllBrands();
 
     return brands;
+  }
+
+  async updateProductStock(productId: string, quantity: number) {
+    return this.catalogRepository.updateProductStock(productId, quantity);
   }
 }

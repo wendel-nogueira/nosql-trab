@@ -3,7 +3,7 @@ import { CatalogService } from "./catalog.service";
 import { NotFoundException } from "../../utils/exceptions";
 import { GetProductsDto } from "./dto/get-products.dto";
 import { ValidateDto } from "../../utils/validator";
-import { Filters } from "./entities/filters.model";
+import { Filters } from "./entities/filters.entity";
 
 export class CatalogController {
   private catalogService: CatalogService;
@@ -46,5 +46,13 @@ export class CatalogController {
   getAllBrands = async (req: Request, res: Response): Promise<Response> => {
     const brands = await this.catalogService?.getAllBrands();
     return res.status(200).json(brands);
+  };
+
+  updateProductStock = async (req: Request, res: Response) => {
+    const { productId, quantity } = req.body;
+
+    await this.catalogService?.updateProductStock(productId, quantity);
+
+    return res.status(200).send();
   };
 }
