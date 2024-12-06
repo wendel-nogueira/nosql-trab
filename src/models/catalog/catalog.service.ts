@@ -45,6 +45,10 @@ export class CatalogService {
     return product;
   }
 
+  async getProductsByIds(ids: string[]): Promise<Product[]> {
+    return this.catalogRepository.getProductsByIDs(ids);
+  }
+
   async getAllCategories(): Promise<string[]> {
     var categories = await this.catalogRepository.getAllCategories();
     return categories;

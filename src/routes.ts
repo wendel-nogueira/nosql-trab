@@ -5,7 +5,7 @@ import { userIdMiddleware } from "./guards/userId.guard";
 import { CatalogController } from "./models/catalog/catalog.controller";
 import { CartController } from "./models/cart/cart.controller";
 import { HistoryController } from "./models/history/history.controller";
-import { OrderController } from "./models/order/order.controller";
+import { OrderController } from "./models/orders/order.controller";
 import { UserController } from "./models/usuarios/usuarios";
 
 const router = Router();
@@ -16,7 +16,6 @@ const historyController = new HistoryController();
 
 const orderService = new OrderController();
 const usuario = new UserController();
-
 
 router.get("/", (req, res) => {
   res.send("Hello World!");
