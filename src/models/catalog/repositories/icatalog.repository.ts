@@ -14,6 +14,10 @@ export interface ICatalogRepository {
     minPrice: number;
   }>;
 
+  searchProducts(query: string): Promise<Product[]>;
+
+  getRecommendedProducts(userId: string, limit: number): Promise<Product[]>;
+
   getProductById(id: string): Promise<Product | null>;
 
   getProductsByIDs(ids: string[]): Promise<Product[]>;

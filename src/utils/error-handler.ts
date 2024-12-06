@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   NotFoundException,
   UnauthorizedException,
+  ConflictException,
 } from "./exceptions";
 
 export const ErrorHandler = (
@@ -55,6 +56,15 @@ export const ErrorHandler = (
         Type: "https://tools.ietf.org/html/rfc7231#section-6.5.4",
         Title: "Not Found",
         Status: 404,
+        Instance: request.url,
+        Detail: error.message,
+      };
+      break;
+    case ConflictException:
+      body = {
+        Type: "https://tools.ietf.org/html/rfc7231#section-6.5.8",
+        Title: "Conflict",
+        Status: 409,
         Instance: request.url,
         Detail: error.message,
       };

@@ -1,6 +1,7 @@
 import { CatalogRepository } from "./repositories/catalog.repository";
 import { Product } from "./entities/product.entity";
 import { Filters } from "./entities/filters.entity";
+import { BadRequestException } from "../../utils/exceptions";
 
 export class CatalogService {
   private catalogRepository: CatalogRepository;
@@ -21,6 +22,17 @@ export class CatalogService {
     minPrice: number;
   }> {
     return this.catalogRepository.getProducts(filters, limit, offset, sort);
+  }
+
+  async searchProducts(query: any): Promise<Product[]> {
+    if (!query || query === "")
+      throw new BadRequestException("Query is required");
+
+    return this.catalogRepository.searchProducts(query);
+  }
+
+  async getRecommendedProducts(userId: string): Promise<Product[]> {
+    return this.catalogRepository.getRecommendedProducts(userId, 20);
   }
 
   async getProductById(id: string): Promise<Product> {

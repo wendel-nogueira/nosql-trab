@@ -2,7 +2,8 @@ import { MongoClient, Db } from "mongodb";
 import { createClient, RedisClientType } from "redis";
 import { OrderService } from "../models/order/order.service";
 import { WebSocketServer, WebSocket } from "ws";
-
+import { Client } from "@elastic/elasticsearch";
+import { driver, auth, Driver } from "neo4j-driver";
 
 import dotenv from "dotenv";
 
@@ -95,4 +96,70 @@ export function createWebSocketServer(server: any): WebSocketServer {
   return wss;
 }
 
-export { mongoDbInstance, redisClient, wss };
+let elasticsearchClient: Client;
+
+export function connectToElasticsearch(): Client {
+  if (elasticsearchClient) {
+    return elasticsearchClient;
+  }
+
+  elasticsearchClient = new Client({
+    node: process.env.ELASTICSEARCH_URI || "",
+    auth: {
+      apiKey: process.env.ELASTICSEARCH_API_KEY || "",
+    },
+    sniffOnStart: true,
+  });
+
+  elasticsearchClient
+    .info()
+    .then((resp) => console.log(resp))
+    .catch((error) => console.error("erro:", error));
+
+  console.log("Cliente Elasticsearch inicializado.");
+
+  return elasticsearchClient;
+}
+
+export async function disconnectFromElasticsearch(): Promise<void> {
+  if (elasticsearchClient) {
+    await elasticsearchClient.close();
+    console.log("Desconectado do Elasticsearch");
+  }
+}
+
+let neo4jDriver: Driver;
+
+export function connectToNeo4j(): any {
+  if (neo4jDriver) {
+    return neo4jDriver;
+  }
+
+  neo4jDriver = driver(
+    process.env.NEO4J_URI || "bolt://localhost:7687",
+    auth.basic(
+      process.env.NEO4J_USER || "neo4j",
+      process.env.NEO4J_PASSWORD || "admin"
+    )
+  );
+
+  console.log("Conectado ao Neo4j");
+
+  return neo4jDriver;
+}
+
+export async function disconnectFromNeo4j(): Promise<void> {
+  if (neo4jDriver) {
+    await neo4jDriver.close();
+    console.log("Desconectado do Neo4j");
+  }
+}
+
+export {
+  mongoDbInstance,
+  redisClient,
+  wss,
+  clients,
+  elasticsearchClient,
+  neo4jDriver,
+};
