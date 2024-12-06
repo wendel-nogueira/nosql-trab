@@ -1,4 +1,3 @@
-import { RedisClientType } from "redis";
 import { Product } from "../entities/product.entity";
 import { ICartRepository } from "./icart.repository";
 import { connectToRedis } from "../../../config/database";

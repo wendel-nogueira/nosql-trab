@@ -1,5 +1,8 @@
 import { MongoClient, Db } from "mongodb";
 import { createClient, RedisClientType } from "redis";
+import { OrderService } from "../models/order/order.service";
+import { WebSocketServer, WebSocket } from "ws";
+
 
 import dotenv from "dotenv";
 
@@ -54,4 +57,42 @@ export async function disconnectFromRedis(): Promise<void> {
   }
 }
 
-export { mongoDbInstance, redisClient };
+export async function connectToQueue(): Promise<void> {
+  const client = await connectToRedis();
+
+  client.on("error", (error) => console.error("Redis Client Error", error));
+
+  const subscriber = client.duplicate();
+
+  await subscriber.connect();
+
+  const orderService = new OrderService();
+
+  while (true) {
+    const orderData = await subscriber.blPop("orders", 0);
+
+    if (orderData) {
+      const order = JSON.parse(orderData.element);
+      await orderService.processOrder(order);
+    }
+  }
+}
+
+let wss: WebSocketServer;
+const clients = new Set<WebSocket>();
+
+export function createWebSocketServer(server: any): WebSocketServer {
+  wss = new WebSocketServer({ server });
+
+  wss.on("connection", (ws: WebSocket) => {
+    clients.add(ws);
+
+    ws.on("close", () => {
+      clients.delete(ws);
+    });
+  });
+
+  return wss;
+}
+
+export { mongoDbInstance, redisClient, wss };
