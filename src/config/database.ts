@@ -1,6 +1,6 @@
 import { MongoClient, Db } from "mongodb";
 import { createClient, RedisClientType } from "redis";
-import { OrderService } from "../models/order/order.service";
+import { OrderService } from "../models/orders/order.service";
 import { WebSocketServer, WebSocket } from "ws";
 import { Client } from "@elastic/elasticsearch";
 import { driver, auth, Driver } from "neo4j-driver";
