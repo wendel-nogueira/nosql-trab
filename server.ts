@@ -16,6 +16,10 @@ import {
   mongoDbInstance,
   connectToQueue,
   createWebSocketServer,
+  connectToElasticsearch,
+  disconnectFromElasticsearch,
+  connectToNeo4j,
+  disconnectFromNeo4j,
 } from "./src/config/database";
 
 dotenv.config();
@@ -31,6 +35,7 @@ app.use(cors());
 app.set("trust proxy", true);
 
 connectToQueue();
+connectToNeo4j();
 createWebSocketServer(server);
 
 app.use("/", router);
@@ -43,6 +48,8 @@ server.listen(port, () => {
 process.on("SIGINT", async () => {
   disconnectFromDatabaseMongoDb();
   disconnectFromRedis();
+  disconnectFromElasticsearch();
+  disconnectFromNeo4j();
   process.exit(0);
 });
 

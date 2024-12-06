@@ -28,6 +28,7 @@ export class OrderService {
     const client = await connectToRedis();
     const userCart = await this.cartRepository.getCartItems(cartId);
 
+    console.log("User cart", userCart);
     if (!userCart || userCart.length === 0)
       throw new NotFoundException("Cart not found");
 

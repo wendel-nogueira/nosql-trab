@@ -21,10 +21,11 @@ export class OrderController {
   createOrder = async (req: Request, res: Response) => {
     const dto = await ValidateDto(req.body, AddOrderDto);
     const { cartId } = dto;
+    const userId = req.body.userId;
 
-    const order = await this.orderService.createOrder(2, cartId!);
+    const order = await this.orderService.createOrder(userId, cartId!);
 
-    return res.status(201).json("order");
+    return res.status(201).json(order);
   };
 
   getOrderById = async (req: Request, res: Response) => {

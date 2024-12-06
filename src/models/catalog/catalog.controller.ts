@@ -26,6 +26,24 @@ export class CatalogController {
     return res.status(200).json(catalog);
   };
 
+  searchProducts = async (req: Request, res: Response) => {
+    const { query } = req.query;
+
+    const products = await this.catalogService?.searchProducts(query);
+
+    return res.status(200).json(products);
+  };
+
+  getRecommendations = async (req: Request, res: Response) => {
+    const { userId } = req.body;
+
+    const recommendations = await this.catalogService?.getRecommendedProducts(
+      userId
+    );
+
+    return res.status(200).json(recommendations);
+  };
+
   getProductById = async (req: Request, res: Response) => {
     const { id } = req.params;
 

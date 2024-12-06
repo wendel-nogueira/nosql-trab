@@ -1,15 +1,22 @@
 import { Product } from "../entities/product.entity";
 import { ICatalogRepository } from "./icatalog.repository";
 import { Filters } from "../entities/filters.entity";
-import { connectToDatabaseMongodb } from "../../../config/database";
+import {
+  connectToDatabaseMongodb,
+  neo4jDriver,
+} from "../../../config/database";
 import { Collection, Db, ObjectId } from "mongodb";
+import { Client } from "@elastic/elasticsearch";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export class CatalogRepository implements ICatalogRepository {
   private db: Db | undefined;
   private collection: Collection<Product> | undefined;
 
   constructor() {
-    this.db = undefined;
     this.init();
   }
 
@@ -36,6 +43,39 @@ export class CatalogRepository implements ICatalogRepository {
     }).toArray();
 
     return products;
+  }
+
+  async searchProducts(query: string): Promise<Product[]> {
+    const elasticsearchClient = new Client({
+      node: process.env.ELASTICSEARCH_URI || "",
+      auth: {
+        apiKey: process.env.ELASTICSEARCH_API_KEY || "",
+      },
+      sniffOnStart: true,
+    });
+
+    const searchResult = await elasticsearchClient
+      .search({
+        index: "connector-nosql",
+        body: {
+          query: {
+            query_string: {
+              query: query,
+              fields: [
+                "title",
+                "main_category",
+                "categories",
+                "details.Manufacturer",
+                "details.Brand",
+              ],
+              fuzziness: "AUTO",
+            },
+          },
+        },
+      })
+      .then((result) => result.hits.hits.map((hit: any) => hit._source));
+
+    return searchResult;
   }
 
   async getProducts(
@@ -73,6 +113,43 @@ export class CatalogRepository implements ICatalogRepository {
       .then((result: any) => result[0]?.price || 0);
 
     return { products, count, maxPrice, minPrice };
+  }
+
+  async getRecommendedProducts(
+    userId: string,
+    limit: number
+  ): Promise<Product[]> {
+    let products: Product[] = [];
+
+    if (userId && userId !== "") {
+      const session = neo4jDriver.session();
+
+      const result = await session.run(
+        `MATCH (u:Usuario)-[c:COMPROU]->(p:Produto)-[:PERTENCE_A]->(categ:Categoria)
+        WHERE u.id = $userId
+        MATCH (recomendado:Produto)-[:PERTENCE_A]->(categ)
+        WHERE NOT (u)-[:COMPROU]->(recomendado)
+        RETURN DISTINCT recomendado, SUM(c.quantidade) AS relevancia
+        ORDER BY relevancia DESC
+        LIMIT 20;`,
+        { userId }
+      );
+
+      const ids = result.records.map(
+        (record) => record.get("recomendado").properties.id
+      );
+
+      products = await this.getProductsByIDs(ids);
+
+      session.close();
+    } else {
+      products = await this.collection!.find()
+        .sort({ average_rating: -1 })
+        .limit(20)
+        .toArray();
+    }
+
+    return products;
   }
 
   async getAllCategories(): Promise<string[]> {

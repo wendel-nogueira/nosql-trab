@@ -24,3 +24,9 @@ export class UnauthorizedException extends Error {
     super(message);
   }
 }
+
+export class ConflictException extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
