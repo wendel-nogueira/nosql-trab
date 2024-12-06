@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { CatalogController } from "./models/catalog/catalog.controller";
 import { CartController } from "./models/cart/cart.controller";
+import { HistoryController } from "./models/history/history.controller";
 import { OrderController } from "./models/order/order.controller";
 
 import { login, criarConta} from "./models/usuarios/usuarios";
@@ -11,7 +12,10 @@ const router = Router();
 
 const catalogController = new CatalogController();
 const cartService = new CartController();
+const historyController = new HistoryController();
+
 const orderService = new OrderController();
+
 
 router.get("/", (req, res) => {
   res.send("Hello World!");
@@ -49,5 +53,7 @@ router.post("/register", criarConta);
 router.get("/orders/:userId", orderService.getOrders);
 router.post("/checkout", orderService.createOrder);
 router.get("/orders/:orderId", orderService.getOrderById);
+
+router.get("/history/:userId", historyController.getCatalog);
 
 export default router;
